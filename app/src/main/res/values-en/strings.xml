@@ -1,0 +1,45 @@
+<resources>
+    <string name="app_name">Seminary</string>
+
+    <!-- Content Descriptions (Accessibility) -->
+    <string name="cd_logo">Logo</string>
+    <string name="cd_search">Search</string>
+    <string name="cd_clear">Clear</string>
+    <string name="cd_back">Back</string>
+    <string name="cd_share">Share</string>
+    <string name="cd_like">Like</string>
+    <string name="cd_favorite">Favorite</string>
+    <string name="cd_error">Error</string>
+
+    <!-- Search Bar -->
+    <string name="search_placeholder">You can search anything&#8230;</string>
+    <string name="no_results_for_query">No results found for \"%1$s\"</string>
+
+    <!-- Bottom Navigation -->
+    <string name="nav_home">Home</string>
+    <string name="nav_search">Search</string>
+    <string name="nav_list">List</string>
+    <string name="nav_settings">Settings</string>
+
+    <!-- Carousels -->
+    <string name="carousel_trending">Trending Now</string>
+    <string name="carousel_popular_movies">Popular - Movie</string>
+    <string name="carousel_popular_series">Popular - Series</string>
+    <string name="see_all">SEE ALL ></string>
+
+    <!-- Movie Details -->
+    <string name="share_chooser_title">Share movie</string>
+    <string name="share_message_template">Look at this movie I found!\n\n🍿 *%1$s*\n%2$s\n\n👉 %3$s</string>
+    <string name="section_director">DIRECTOR</string>
+    <string name="section_cast">CAST</string>
+    <string name="genre_action">Action</string>
+    <string name="genre_adventure">Adventure</string>
+
+    <!-- Favorites / Wishlist -->
+    <string name="empty_favorites_message">You don\'t have any movies saved in your list</string>
+
+    <!-- Error Screen & System -->
+    <string name="error_title">Oops! Something went wrong</string>
+    <string name="error_movie_not_found">Selected movie details could not be found.</string>
+    <string name="btn_retry">Retry</string>
+</resources>

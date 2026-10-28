@@ -1,0 +1,45 @@
+<resources>
+    <string name="app_name">Seminario</string>
+
+    <!-- Descripciones de contenido (Accesibilidad) -->
+    <string name="cd_logo">Logo</string>
+    <string name="cd_search">Buscar</string>
+    <string name="cd_clear">Limpiar</string>
+    <string name="cd_back">Volver</string>
+    <string name="cd_share">Compartir</string>
+    <string name="cd_like">Me gusta</string>
+    <string name="cd_favorite">Favorito</string>
+    <string name="cd_error">Error</string>
+
+    <!-- Barra de Búsqueda -->
+    <string name="search_placeholder">Puedes buscar cualquier cosa&#8230;</string>
+    <string name="no_results_for_query">No se encontraron resultados para \"%1$s\"</string>
+
+    <!-- Navegación Inferior -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_search">Buscar</string>
+    <string name="nav_list">Lista</string>
+    <string name="nav_settings">Ajustes</string>
+
+    <!-- Carruseles de Inicio -->
+    <string name="carousel_trending">Tendencias</string>
+    <string name="carousel_popular_movies">Películas Populares</string>
+    <string name="carousel_popular_series">Series Populares</string>
+    <string name="see_all">VER TODO ></string>
+
+    <!-- Detalle de Película -->
+    <string name="share_chooser_title">Compartir película</string>
+    <string name="share_message_template">¡Mirá esta película que encontré!\n\n🍿 *%1$s*\n%2$s\n\n👉 %3$s</string>
+    <string name="section_director">DIRECTOR</string>
+    <string name="section_cast">REPARTO</string>
+    <string name="genre_action">Acción</string>
+    <string name="genre_adventure">Aventura</string>
+
+    <!-- Lista de Deseados / Favoritos -->
+    <string name="empty_favorites_message">No tienes películas guardadas en tu lista</string>
+
+    <!-- Pantalla de Error y Sistema -->
+    <string name="error_title">¡Ups! Algo salió mal</string>
+    <string name="error_movie_not_found">No se encontró la información de la película seleccionada.</string>
+    <string name="btn_retry">Reintentar</string>
+</resources>
