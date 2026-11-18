@@ -59,7 +59,6 @@ import com.example.seminario.data.model.mockMovies
 fun MovieContent(
     trending: List<Movie> = emptyList(),
     popularMovies: List<Movie> = emptyList(),
-    popularSeries: List<Movie> = emptyList(),
     movies: List<Movie> = emptyList(),
     favoriteMovies: List<Movie> = emptyList(),
     searchQuery: String = "",
@@ -73,7 +72,6 @@ fun MovieContent(
 ) {
     val actualTrending = trending.ifEmpty { movies }
     val actualPopularMovies = popularMovies.ifEmpty { movies }
-    val actualPopularSeries = popularSeries.ifEmpty { movies }
 
     val focusRequester = remember { FocusRequester() }
 
@@ -289,14 +287,6 @@ fun MovieContent(
                             )
                         }
 
-                        if (actualPopularSeries.isNotEmpty()) {
-                            MovieCarousel(
-                                title = stringResource(R.string.carousel_popular_series),
-                                movies = actualPopularSeries,
-                                onMovieClick = { onNavigateToDetails(it.id) }
-                            )
-                        }
-
                         Spacer(modifier = Modifier.height(100.dp))
                     }
                 }
@@ -388,7 +378,6 @@ fun PreviewMovieContent() {
     MovieContent(
         trending = listaLarga,
         popularMovies = listaLarga,
-        popularSeries = listaLarga,
         onNavigateToDetails = { /* No hacemos nada en la vista previa */ }
     )
 }

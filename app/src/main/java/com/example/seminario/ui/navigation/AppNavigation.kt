@@ -30,7 +30,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -38,35 +38,28 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.seminario.R
 import com.example.seminario.ui.MovieContent
-import com.example.seminario.ui.MovieDetailsContent
+import com.example.seminario.ui.MovieDetailScreen
+import com.example.seminario.ui.MovieDetailViewModel
 import com.example.seminario.ui.MovieUiState
 import com.example.seminario.ui.MovieViewModel
 
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-    val viewModel: MovieViewModel = viewModel()
-
-    val favoriteMovies by viewModel.favoriteMovies.collectAsState()
-    val selectedTab by viewModel.selectedTab.collectAsState()
 
     NavHost(navController = navController, startDestination = "home") {
 
         composable("home") {
+            // ViewModel propio de la pantalla principal (Hilt inyecta sus dependencias)
+            val viewModel: MovieViewModel = hiltViewModel()
+
             val uiState by viewModel.uiState.collectAsState()
             val searchQuery by viewModel.searchQuery.collectAsState()
+            val favoriteMovies by viewModel.favoriteMovies.collectAsState()
+            val selectedTab by viewModel.selectedTab.collectAsState()
 
             when (val state = uiState) {
-                is MovieUiState.Loading -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color(0xFF0F0F13)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = Color(0xFF2962FF))
-                    }
-                }
+                is MovieUiState.Loading -> LoadingScreen()
                 is MovieUiState.Error -> {
                     ErrorScreen(
                         message = state.message,
@@ -77,8 +70,7 @@ fun AppNavigation() {
                     MovieContent(
                         trending = state.trending,
                         popularMovies = state.popularMovies,
-                        popularSeries = state.popularSeries,
-                        favoriteMovies = favoriteMovies.toList(),
+                        favoriteMovies = favoriteMovies,
                         searchQuery = searchQuery,
                         isSearching = state.isSearching,
                         searchResults = state.searchResults,
@@ -95,52 +87,30 @@ fun AppNavigation() {
         }
 
         composable(
-            route = "details/{movieId}",
-            arguments = listOf(navArgument("movieId") { type = NavType.IntType })
-        ) { backStackEntry ->
-            val movieId = backStackEntry.arguments?.getInt("movieId") ?: 0
-            val uiState by viewModel.uiState.collectAsState()
+            route = "details/{${MovieDetailViewModel.MOVIE_ID_ARG}}",
+            arguments = listOf(navArgument(MovieDetailViewModel.MOVIE_ID_ARG) { type = NavType.IntType })
+        ) {
+            // ViewModel propio del detalle: recibe solo el ID (vía SavedStateHandle)
+            // y consulta el servicio movie-details por su cuenta
+            val detailViewModel: MovieDetailViewModel = hiltViewModel()
 
-            when (val state = uiState) {
-                is MovieUiState.Success -> {
-                    val peliculaSeleccionada = state.trending.find { it.id == movieId }
-                        ?: state.popularMovies.find { it.id == movieId }
-                        ?: state.popularSeries.find { it.id == movieId }
-                        ?: state.searchResults.find { it.id == movieId }
-                        ?: favoriteMovies.find { it.id == movieId }
-
-                    if (peliculaSeleccionada != null) {
-                        MovieDetailsContent(
-                            movie = peliculaSeleccionada,
-                            isFavorite = favoriteMovies.any { it.id == movieId },
-                            onToggleFavorite = { viewModel.toggleFavorite(it) },
-                            onBackClick = { navController.popBackStack() }
-                        )
-                    } else {
-                        ErrorScreen(
-                            message = stringResource(R.string.error_movie_not_found),
-                            onRetry = { navController.popBackStack() }
-                        )
-                    }
-                }
-                is MovieUiState.Loading -> {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color(0xFF0F0F13)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = Color(0xFF2962FF))
-                    }
-                }
-                is MovieUiState.Error -> {
-                    ErrorScreen(
-                        message = state.message,
-                        onRetry = { viewModel.fetchMovies() }
-                    )
-                }
-            }
+            MovieDetailScreen(
+                viewModel = detailViewModel,
+                onBackClick = { navController.popBackStack() }
+            )
         }
+    }
+}
+
+@Composable
+fun LoadingScreen() {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color(0xFF0F0F13)),
+        contentAlignment = Alignment.Center
+    ) {
+        CircularProgressIndicator(color = Color(0xFF2962FF))
     }
 }
 

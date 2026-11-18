@@ -1,7 +1,21 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.hilt)
 }
+
+// La API key de TMDB se lee de local.properties (no se sube al repositorio).
+// Si no está definida, se usa una key por defecto para que el proyecto compile al clonarlo.
+val localProperties = Properties().apply {
+    val file = rootProject.file("local.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+}
+val tmdbApiKey: String = localProperties.getProperty("TMDB_API_KEY")
+    ?.takeIf { it.isNotBlank() }
+    ?: "b03dd5922357d959cbb9c22994c60c2a"
 
 android {
     namespace = "com.example.seminario"
@@ -17,6 +31,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "TMDB_API_KEY", "\"$tmdbApiKey\"")
     }
 
     buildTypes {
@@ -33,6 +49,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -64,4 +81,9 @@ dependencies {
 
 // Coil (Para descargar y mostrar las portadas reales de las películas)
     implementation("io.coil-kt:coil-compose:2.6.0")
+
+// Hilt (Inyección de dependencias)
+    implementation(libs.hilt.android)
+    ksp(libs.hilt.compiler)
+    implementation(libs.androidx.hilt.navigation.compose)
 }

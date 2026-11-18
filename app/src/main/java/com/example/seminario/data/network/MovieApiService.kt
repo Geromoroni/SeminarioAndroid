@@ -1,6 +1,7 @@
 package com.example.seminario.data.network
 
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface MovieApiService {
@@ -11,14 +12,8 @@ interface MovieApiService {
         @Query("language") language: String = "es-AR"
     ): MovieResponse
 
-    @GET("tv/popular")
-    suspend fun getPopularSeries(
-        @Query("api_key") apiKey: String,
-        @Query("language") language: String = "es-AR"
-    ): MovieResponse
-
-    @GET("trending/all/week")
-    suspend fun getTrending(
+    @GET("trending/movie/week")
+    suspend fun getTrendingMovies(
         @Query("api_key") apiKey: String,
         @Query("language") language: String = "es-AR"
     ): MovieResponse
@@ -29,4 +24,14 @@ interface MovieApiService {
         @Query("query") query: String,
         @Query("language") language: String = "es-AR"
     ): MovieResponse
+
+    // movie-details: https://developer.themoviedb.org/reference/movie-details
+    // "append_to_response=credits" agrega director y reparto en la misma consulta.
+    @GET("movie/{movie_id}")
+    suspend fun getMovieDetails(
+        @Path("movie_id") movieId: Int,
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String = "es-AR",
+        @Query("append_to_response") appendToResponse: String = "credits"
+    ): MovieDetailsDto
 }

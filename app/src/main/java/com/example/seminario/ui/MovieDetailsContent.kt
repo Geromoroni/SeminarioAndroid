@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -29,6 +28,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -37,29 +38,63 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.seminario.R
-import com.example.seminario.data.model.Movie
-import com.example.seminario.data.model.mockMovies
+import com.example.seminario.data.model.MovieDetails
+import com.example.seminario.data.model.mockMovieDetails
+import com.example.seminario.ui.navigation.ErrorScreen
+import com.example.seminario.ui.navigation.LoadingScreen
+import java.util.Locale
+
+// Pantalla de detalle con estado: carga, error con reintento y contenido
+@Composable
+fun MovieDetailScreen(
+    viewModel: MovieDetailViewModel,
+    onBackClick: () -> Unit
+) {
+    val uiState by viewModel.uiState.collectAsState()
+    val isFavorite by viewModel.isFavorite.collectAsState()
+
+    when (val state = uiState) {
+        is MovieDetailUiState.Loading -> LoadingScreen()
+        is MovieDetailUiState.Error -> ErrorScreen(
+            message = state.message,
+            onRetry = { viewModel.loadMovieDetails() }
+        )
+        is MovieDetailUiState.Success -> MovieDetailsContent(
+            details = state.details,
+            isFavorite = isFavorite,
+            onToggleFavorite = { viewModel.toggleFavorite() },
+            onBackClick = onBackClick
+        )
+    }
+}
 
 @Composable
 fun MovieDetailsContent(
-    movie: Movie,
+    details: MovieDetails,
     isFavorite: Boolean = false,
-    onToggleFavorite: (Movie) -> Unit = {},
+    onToggleFavorite: () -> Unit = {},
     onBackClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val shareChooserTitle = stringResource(R.string.share_chooser_title)
     val shareMessageTemplate = stringResource(
         R.string.share_message_template,
-        movie.title,
-        movie.synopsis,
-        "https://www.themoviedb.org/movie/${movie.id}"
+        details.title,
+        details.synopsis,
+        "https://www.themoviedb.org/movie/${details.id}"
+    )
+
+    val infoParts = listOfNotNull(
+        details.runtimeMinutes?.let { stringResource(R.string.details_runtime, it) },
+        details.year,
+        "★ " + String.format(Locale.getDefault(), "%.1f", details.rating)
     )
 
     Column(
@@ -74,14 +109,14 @@ fun MovieDetailsContent(
                 .height(450.dp)
                 .background(Color(0xFF1A1A1F))
         ) {
-            val imageToLoad = movie.backdropUrl.ifEmpty { movie.imageUrl }
+            val imageToLoad = details.backdropUrl.ifEmpty { details.posterUrl }
             if (imageToLoad.isNotEmpty()) {
                 AsyncImage(
                     model = ImageRequest.Builder(LocalContext.current)
                         .data(imageToLoad)
                         .crossfade(true)
                         .build(),
-                    contentDescription = movie.title,
+                    contentDescription = details.title,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
@@ -99,13 +134,14 @@ fun MovieDetailsContent(
             )
 
             Text(
-                text = movie.title,
+                text = details.title,
                 color = Color.White,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 32.dp)
+                    .padding(start = 16.dp, end = 16.dp, bottom = 32.dp)
             )
 
             Row(
@@ -125,24 +161,23 @@ fun MovieDetailsContent(
                     )
                 }
 
-                Row {
-                    IconButton(
-                        onClick = {
-                            val sendIntent = Intent().apply {
-                                action = Intent.ACTION_SEND
-                                putExtra(Intent.EXTRA_TEXT, shareMessageTemplate)
-                                type = "text/plain"
-                            }
-                            val shareIntent = Intent.createChooser(sendIntent, shareChooserTitle)
-                            context.startActivity(shareIntent)
+                IconButton(
+                    onClick = {
+                        val sendIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, shareMessageTemplate)
+                            type = "text/plain"
                         }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Share,
-                            contentDescription = stringResource(R.string.cd_share),
-                            tint = Color.White
-                        )
-                    }
+                        val shareIntent = Intent.createChooser(sendIntent, shareChooserTitle)
+                        context.startActivity(shareIntent)
+                    },
+                    modifier = Modifier.background(Color.Black.copy(alpha = 0.5f), CircleShape)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Share,
+                        contentDescription = stringResource(R.string.cd_share),
+                        tint = Color.White
+                    )
                 }
             }
         }
@@ -154,7 +189,7 @@ fun MovieDetailsContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "${movie.duration}  ·  ${movie.year}  ·  ${movie.rating}",
+                text = infoParts.joinToString("  ·  "),
                 color = Color.White,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
@@ -163,7 +198,7 @@ fun MovieDetailsContent(
             Spacer(modifier = Modifier.weight(1f))
 
             // Ícono interactivo de Favoritos (Corazón)
-            IconButton(onClick = { onToggleFavorite(movie) }) {
+            IconButton(onClick = onToggleFavorite) {
                 Icon(
                     imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = stringResource(R.string.cd_favorite),
@@ -174,34 +209,41 @@ fun MovieDetailsContent(
         }
 
         Text(
-            text = movie.synopsis,
+            text = details.synopsis.ifEmpty { stringResource(R.string.details_no_synopsis) },
             color = Color(0xFFB3B3B3),
             fontSize = 16.sp,
             lineHeight = 24.sp,
             modifier = Modifier.padding(16.dp)
         )
 
-        Row(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
-            DetailChip(stringResource(R.string.genre_action))
-            Spacer(modifier = Modifier.width(8.dp))
-            DetailChip(stringResource(R.string.genre_adventure))
+        if (details.genres.isNotEmpty()) {
+            SectionTitle(stringResource(R.string.section_genres))
+            ChipRow(details.genres)
         }
 
-        SectionTitle(stringResource(R.string.section_director))
-        Row(modifier = Modifier.padding(horizontal = 16.dp)) {
-            DetailChip("Destin Daniel Cretton")
+        if (details.directors.isNotEmpty()) {
+            SectionTitle(stringResource(R.string.section_director))
+            ChipRow(details.directors)
         }
 
-        SectionTitle(stringResource(R.string.section_cast))
-        LazyRow(contentPadding = PaddingValues(horizontal = 16.dp)) {
-            val cast = listOf("Tom Holland", "Zendaya", "Mark Ruffalo")
-            items(cast) { actor ->
-                DetailChip(actor)
-                Spacer(modifier = Modifier.width(8.dp))
-            }
+        if (details.cast.isNotEmpty()) {
+            SectionTitle(stringResource(R.string.section_cast))
+            ChipRow(details.cast)
         }
 
         Spacer(modifier = Modifier.height(32.dp))
+    }
+}
+
+@Composable
+private fun ChipRow(values: List<String>) {
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(values) { value ->
+            DetailChip(value)
+        }
     }
 }
 
@@ -230,5 +272,5 @@ fun DetailChip(text: String) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewMovieDetails() {
-    MovieDetailsContent(movie = mockMovies.first(), onBackClick = {})
+    MovieDetailsContent(details = mockMovieDetails, onBackClick = {})
 }
