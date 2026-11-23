@@ -2,7 +2,7 @@
 
 Aplicación Android desarrollada con **Kotlin** y **Jetpack Compose** que consume la API de **The Movie Database (TMDB)** aplicando el patrón de arquitectura **MVVM**.
 
-## 🚀 Características
+##  Características
 - **Arquitectura:** MVVM en capas: `ApiService (Retrofit)` → `RemoteDataSource` → `Repository` → `ViewModel` → UI, con estado expuesto mediante `StateFlow`.
 - **Inyección de dependencias:** Hilt (`@HiltAndroidApp`, `@AndroidEntryPoint`, `@HiltViewModel`, `NetworkModule`).
 - **Detalle de película:** pantalla con ViewModel propio que recibe solo el ID por navegación (`SavedStateHandle`) y consulta el endpoint `movie/{movie_id}` (con `append_to_response=credits`) para mostrar géneros, duración, dirección y reparto.
@@ -15,7 +15,7 @@ Aplicación Android desarrollada con **Kotlin** y **Jetpack Compose** que consum
   - Idioma dinámico: la app (strings) y las respuestas de la API siguen el idioma del dispositivo (español / inglés).
   - Integración nativa para compartir películas (Android Intent).
 
-## 🛠️ Configuración previa para ejecutar
+##  Configuración previa para ejecutar
 1. Obtener una clave gratuita en [The Movie Database (TMDB)](https://www.themoviedb.org/).
 2. Agregar la clave en el archivo `local.properties` de la raíz del proyecto (no se sube al repositorio):
    ```properties
