@@ -42,6 +42,8 @@ import com.example.seminario.ui.MovieDetailScreen
 import com.example.seminario.ui.MovieDetailViewModel
 import com.example.seminario.ui.MovieUiState
 import com.example.seminario.ui.MovieViewModel
+import com.example.seminario.ui.toMessage
+import com.example.seminario.data.error.AppError
 
 @Composable
 fun AppNavigation() {
@@ -62,7 +64,7 @@ fun AppNavigation() {
                 is MovieUiState.Loading -> LoadingScreen()
                 is MovieUiState.Error -> {
                     ErrorScreen(
-                        message = state.message,
+                        error = state.error,
                         onRetry = { viewModel.fetchMovies() }
                     )
                 }
@@ -116,7 +118,7 @@ fun LoadingScreen() {
 
 @Composable
 fun ErrorScreen(
-    message: String,
+    error: AppError,
     onRetry: () -> Unit
 ) {
     Column(
@@ -146,7 +148,7 @@ fun ErrorScreen(
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = message,
+            text = error.toMessage(),
             color = Color(0xFFA0A0A5),
             fontSize = 14.sp,
             textAlign = TextAlign.Center,

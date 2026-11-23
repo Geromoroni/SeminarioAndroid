@@ -34,6 +34,7 @@
     <string name="section_cast">REPARTO</string>
     <string name="details_runtime">%1$d min</string>
     <string name="details_no_synopsis">Sin sinopsis disponible.</string>
+    <string name="details_untitled">Sin título</string>
 
     <!-- Lista de Deseados / Favoritos -->
     <string name="empty_favorites_message">No tienes películas guardadas en tu lista</string>
@@ -41,4 +42,10 @@
     <!-- Pantalla de Error y Sistema -->
     <string name="error_title">¡Ups! Algo salió mal</string>
     <string name="btn_retry">Reintentar</string>
+    <string name="error_no_connection">Sin conexión a internet. Verificá tu red e intentá de nuevo.</string>
+    <string name="error_unauthorized">Error de autenticación con TMDB. Revisá la API key configurada en local.properties.</string>
+    <string name="error_not_found">El contenido solicitado no fue encontrado.</string>
+    <string name="error_server">El servidor de TMDB no respondió correctamente (código %1$d). Intentá más tarde.</string>
+    <string name="error_empty">No se encontraron resultados disponibles en este momento.</string>
+    <string name="error_unexpected">Ocurrió un error inesperado. Intentá de nuevo.</string>
 </resources>

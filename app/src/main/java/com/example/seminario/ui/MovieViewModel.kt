@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.seminario.data.FavoritesRepository
 import com.example.seminario.data.MovieRepository
+import com.example.seminario.data.error.AppError
+import com.example.seminario.data.error.AppException
 import com.example.seminario.data.model.Movie
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,14 +15,14 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed class MovieUiState {
-    object Loading : MovieUiState()
+    data object Loading : MovieUiState()
     data class Success(
         val trending: List<Movie>,
         val popularMovies: List<Movie>,
         val searchResults: List<Movie> = emptyList(),
         val isSearching: Boolean = false
     ) : MovieUiState()
-    data class Error(val message: String) : MovieUiState()
+    data class Error(val error: AppError) : MovieUiState()
 }
 
 // ViewModel de la pantalla principal (lista de películas). Hilt inyecta los repositorios.
@@ -79,7 +81,7 @@ class MovieViewModel @Inject constructor(
             try {
                 val results = repository.searchMovies(query)
                 _uiState.value = currentState.copy(searchResults = results, isSearching = true)
-            } catch (e: Exception) {
+            } catch (e: AppException) {
                 _uiState.value = currentState.copy(searchResults = emptyList(), isSearching = true)
             }
         }
@@ -92,17 +94,13 @@ class MovieViewModel @Inject constructor(
                 val tendencias = repository.getTrendingMovies()
                 val peliculas = repository.getPopularMovies()
 
-                if (tendencias.isNotEmpty() || peliculas.isNotEmpty()) {
-                    _uiState.value = MovieUiState.Success(
-                        trending = tendencias,
-                        popularMovies = peliculas
-                    )
+                _uiState.value = if (tendencias.isNotEmpty() || peliculas.isNotEmpty()) {
+                    MovieUiState.Success(trending = tendencias, popularMovies = peliculas)
                 } else {
-                    _uiState.value = MovieUiState.Error("No se encontraron resultados disponibles en este momento.")
+                    MovieUiState.Error(AppError.Empty)
                 }
-            } catch (e: Exception) {
-                val errorMessage = e.localizedMessage ?: "Fallo al conectar con el servidor."
-                _uiState.value = MovieUiState.Error(errorMessage)
+            } catch (e: AppException) {
+                _uiState.value = MovieUiState.Error(e.error)
             }
         }
     }

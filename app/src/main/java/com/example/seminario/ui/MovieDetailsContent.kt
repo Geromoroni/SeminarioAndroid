@@ -46,7 +46,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.seminario.R
 import com.example.seminario.data.model.MovieDetails
-import com.example.seminario.data.model.mockMovieDetails
+import com.example.seminario.ui.preview.previewMovieDetails
 import com.example.seminario.ui.navigation.ErrorScreen
 import com.example.seminario.ui.navigation.LoadingScreen
 import java.util.Locale
@@ -63,7 +63,7 @@ fun MovieDetailScreen(
     when (val state = uiState) {
         is MovieDetailUiState.Loading -> LoadingScreen()
         is MovieDetailUiState.Error -> ErrorScreen(
-            message = state.message,
+            error = state.error,
             onRetry = { viewModel.loadMovieDetails() }
         )
         is MovieDetailUiState.Success -> MovieDetailsContent(
@@ -83,10 +83,11 @@ fun MovieDetailsContent(
     onBackClick: () -> Unit = {}
 ) {
     val context = LocalContext.current
+    val title = details.title.ifBlank { stringResource(R.string.details_untitled) }
     val shareChooserTitle = stringResource(R.string.share_chooser_title)
     val shareMessageTemplate = stringResource(
         R.string.share_message_template,
-        details.title,
+        title,
         details.synopsis,
         "https://www.themoviedb.org/movie/${details.id}"
     )
@@ -116,7 +117,7 @@ fun MovieDetailsContent(
                         .data(imageToLoad)
                         .crossfade(true)
                         .build(),
-                    contentDescription = details.title,
+                    contentDescription = title,
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
@@ -134,7 +135,7 @@ fun MovieDetailsContent(
             )
 
             Text(
-                text = details.title,
+                text = title,
                 color = Color.White,
                 fontSize = 28.sp,
                 fontWeight = FontWeight.Bold,
@@ -272,5 +273,5 @@ fun DetailChip(text: String) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewMovieDetails() {
-    MovieDetailsContent(details = mockMovieDetails, onBackClick = {})
+    MovieDetailsContent(details = previewMovieDetails, onBackClick = {})
 }

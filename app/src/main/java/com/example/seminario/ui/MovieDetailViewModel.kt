@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.seminario.data.FavoritesRepository
 import com.example.seminario.data.MovieRepository
+import com.example.seminario.data.error.AppError
+import com.example.seminario.data.error.AppException
 import com.example.seminario.data.model.MovieDetails
 import com.example.seminario.data.model.toMovie
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,9 +20,9 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed class MovieDetailUiState {
-    object Loading : MovieDetailUiState()
+    data object Loading : MovieDetailUiState()
     data class Success(val details: MovieDetails) : MovieDetailUiState()
-    data class Error(val message: String) : MovieDetailUiState()
+    data class Error(val error: AppError) : MovieDetailUiState()
 }
 
 /**
@@ -56,8 +58,8 @@ class MovieDetailViewModel @Inject constructor(
             _uiState.value = MovieDetailUiState.Loading
             _uiState.value = try {
                 MovieDetailUiState.Success(repository.getMovieDetails(movieId))
-            } catch (e: Exception) {
-                MovieDetailUiState.Error(e.localizedMessage ?: "No se pudo cargar el detalle de la película.")
+            } catch (e: AppException) {
+                MovieDetailUiState.Error(e.error)
             }
         }
     }
