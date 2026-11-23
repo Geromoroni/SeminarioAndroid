@@ -18,6 +18,20 @@ interface MovieApiService {
         @Query("language") language: String
     ): MovieResponse
 
+    // Películas mejor valoradas (carrusel "Mejor valoradas")
+    @GET("movie/top_rated")
+    suspend fun getTopRatedMovies(
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String
+    ): MovieResponse
+
+    // Próximos estrenos (carrusel "Próximos estrenos")
+    @GET("movie/upcoming")
+    suspend fun getUpcomingMovies(
+        @Query("api_key") apiKey: String,
+        @Query("language") language: String
+    ): MovieResponse
+
     @GET("search/movie")
     suspend fun searchMovies(
         @Query("api_key") apiKey: String,

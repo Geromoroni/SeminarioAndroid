@@ -23,6 +23,14 @@ class MovieRepository @Inject constructor(
     suspend fun getTrendingMovies(): List<Movie> =
         remoteDataSource.getTrendingMovies().map { it.toMovie() }
 
+    // Mejor valoradas, mapeadas a modelo de dominio
+    suspend fun getTopRatedMovies(): List<Movie> =
+        remoteDataSource.getTopRatedMovies().map { it.toMovie() }
+
+    // Próximos estrenos, mapeados a modelo de dominio
+    suspend fun getUpcomingMovies(): List<Movie> =
+        remoteDataSource.getUpcomingMovies().map { it.toMovie() }
+
     suspend fun searchMovies(query: String): List<Movie> =
         remoteDataSource.searchMovies(query).map { it.toMovie() }
 

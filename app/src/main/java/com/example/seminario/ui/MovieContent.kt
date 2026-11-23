@@ -59,6 +59,9 @@ import com.example.seminario.ui.preview.previewMovies
 fun MovieContent(
     trending: List<Movie> = emptyList(),
     popularMovies: List<Movie> = emptyList(),
+    // Carruseles nuevos (pueden venir vacíos si la API falló)
+    topRated: List<Movie> = emptyList(),
+    upcoming: List<Movie> = emptyList(),
     movies: List<Movie> = emptyList(),
     favoriteMovies: List<Movie> = emptyList(),
     searchQuery: String = "",
@@ -283,6 +286,24 @@ fun MovieContent(
                             MovieCarousel(
                                 title = stringResource(R.string.carousel_popular_movies),
                                 movies = actualPopularMovies,
+                                onMovieClick = { onNavigateToDetails(it.id) }
+                            )
+                        }
+
+                        // Carrusel "Mejor valoradas": si la lista está vacía no se muestra (ni su título)
+                        if (topRated.isNotEmpty()) {
+                            MovieCarousel(
+                                title = stringResource(R.string.carousel_top_rated),
+                                movies = topRated,
+                                onMovieClick = { onNavigateToDetails(it.id) }
+                            )
+                        }
+
+                        // Carrusel "Próximos estrenos": misma lógica
+                        if (upcoming.isNotEmpty()) {
+                            MovieCarousel(
+                                title = stringResource(R.string.carousel_upcoming),
+                                movies = upcoming,
                                 onMovieClick = { onNavigateToDetails(it.id) }
                             )
                         }

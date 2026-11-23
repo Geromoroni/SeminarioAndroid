@@ -24,6 +24,9 @@
     <!-- Carruseles de Inicio -->
     <string name="carousel_trending">Tendencias</string>
     <string name="carousel_popular_movies">Películas Populares</string>
+    <!-- Carruseles nuevos -->
+    <string name="carousel_top_rated">Mejor valoradas</string>
+    <string name="carousel_upcoming">Próximos estrenos</string>
     <string name="see_all">VER TODO ></string>
 
     <!-- Detalle de Película -->

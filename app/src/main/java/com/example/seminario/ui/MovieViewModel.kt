@@ -19,6 +19,9 @@ sealed class MovieUiState {
     data class Success(
         val trending: List<Movie>,
         val popularMovies: List<Movie>,
+        // Carruseles extra: si fallan quedan vacíos (no bloquean la pantalla)
+        val topRated: List<Movie> = emptyList(),
+        val upcoming: List<Movie> = emptyList(),
         val searchResults: List<Movie> = emptyList(),
         val isSearching: Boolean = false
     ) : MovieUiState()
@@ -95,7 +98,13 @@ class MovieViewModel @Inject constructor(
                 val peliculas = repository.getPopularMovies()
 
                 _uiState.value = if (tendencias.isNotEmpty() || peliculas.isNotEmpty()) {
-                    MovieUiState.Success(trending = tendencias, popularMovies = peliculas)
+                    MovieUiState.Success(
+                        trending = tendencias,
+                        popularMovies = peliculas,
+                        // Las listas nuevas no deciden el error: si fallan, quedan vacías
+                        topRated = loadOrEmpty { repository.getTopRatedMovies() },
+                        upcoming = loadOrEmpty { repository.getUpcomingMovies() }
+                    )
                 } else {
                     MovieUiState.Error(AppError.Empty)
                 }
@@ -104,4 +113,12 @@ class MovieViewModel @Inject constructor(
             }
         }
     }
+
+    // Ejecuta la carga y, si hay un error de la API, devuelve una lista vacía
+    private suspend fun loadOrEmpty(load: suspend () -> List<Movie>): List<Movie> =
+        try {
+            load()
+        } catch (e: AppException) {
+            emptyList()
+        }
 }
