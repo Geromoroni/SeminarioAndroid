@@ -34,6 +34,7 @@
     <string name="section_cast">CAST</string>
     <string name="details_runtime">%1$d min</string>
     <string name="details_no_synopsis">No synopsis available.</string>
+    <string name="details_untitled">Untitled</string>
 
     <!-- Favorites / Wishlist -->
     <string name="empty_favorites_message">You don\'t have any movies saved in your list</string>
@@ -41,4 +42,10 @@
     <!-- Error Screen & System -->
     <string name="error_title">Oops! Something went wrong</string>
     <string name="btn_retry">Retry</string>
+    <string name="error_no_connection">No internet connection. Check your network and try again.</string>
+    <string name="error_unauthorized">Authentication error with TMDB. Check the API key set in local.properties.</string>
+    <string name="error_not_found">The requested content was not found.</string>
+    <string name="error_server">The TMDB server did not respond correctly (code %1$d). Please try again later.</string>
+    <string name="error_empty">No results available right now.</string>
+    <string name="error_unexpected">An unexpected error occurred. Please try again.</string>
 </resources>

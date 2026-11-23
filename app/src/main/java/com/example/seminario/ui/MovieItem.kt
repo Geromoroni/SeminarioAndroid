@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.example.seminario.data.model.Movie
-import com.example.seminario.data.model.mockMovies
+import com.example.seminario.ui.preview.previewMovies
 
 
 @Composable
@@ -49,5 +49,5 @@ fun MovieItem(movie: Movie, onClick: () -> Unit = {}) {
 @Preview(showBackground = true, backgroundColor = 0xFF0F0F13)
 @Composable
 fun PreviewMovieItem() {
-    MovieItem(movie = mockMovies.first(), onClick = {})
+    MovieItem(movie = previewMovies.first(), onClick = {})
 }

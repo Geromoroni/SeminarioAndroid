@@ -5,54 +5,46 @@ import com.example.seminario.data.model.Movie
 import com.example.seminario.data.model.MovieDetails
 import com.example.seminario.data.network.MovieDetailsDto
 import com.example.seminario.data.network.MovieDto
-import kotlinx.coroutines.CancellationException
-import retrofit2.HttpException
-import java.io.IOException
-import java.net.UnknownHostException
 import javax.inject.Inject
 import javax.inject.Singleton
 
 /**
- * Repository: obtiene los datos del DataSource, los transforma a modelos de dominio
- * y traduce los errores a mensajes entendibles para el usuario.
+ * Repository: obtiene los datos del DataSource y los transforma a modelos de dominio.
+ * Los errores llegan ya tipificados desde el DataSource (AppException con un AppError).
  */
 @Singleton
 class MovieRepository @Inject constructor(
     private val remoteDataSource: MovieRemoteDataSource
 ) {
 
-    suspend fun getPopularMovies(): List<Movie> = safeApiCall {
+    suspend fun getPopularMovies(): List<Movie> =
         remoteDataSource.getPopularMovies().map { it.toMovie() }
-    }
 
-    suspend fun getTrendingMovies(): List<Movie> = safeApiCall {
+    suspend fun getTrendingMovies(): List<Movie> =
         remoteDataSource.getTrendingMovies().map { it.toMovie() }
-    }
 
-    suspend fun searchMovies(query: String): List<Movie> = safeApiCall {
+    suspend fun searchMovies(query: String): List<Movie> =
         remoteDataSource.searchMovies(query).map { it.toMovie() }
-    }
 
-    suspend fun getMovieDetails(movieId: Int): MovieDetails = safeApiCall {
+    suspend fun getMovieDetails(movieId: Int): MovieDetails =
         remoteDataSource.getMovieDetails(movieId).toMovieDetails()
-    }
 
     private fun MovieDto.toMovie(): Movie = Movie(
         id = id,
-        title = title ?: "Sin título",
-        synopsis = overview ?: "",
+        title = title.orEmpty(),
+        synopsis = overview.orEmpty(),
         rating = voteAverage ?: 0.0,
-        year = releaseDate?.take(4)?.ifEmpty { null } ?: "N/A",
+        year = releaseYear(releaseDate),
         imageUrl = posterUrl(posterPath),
         backdropUrl = backdropUrl(backdropPath)
     )
 
     private fun MovieDetailsDto.toMovieDetails(): MovieDetails = MovieDetails(
         id = id,
-        title = title ?: "Sin título",
-        synopsis = overview ?: "",
+        title = title.orEmpty(),
+        synopsis = overview.orEmpty(),
         rating = voteAverage ?: 0.0,
-        year = releaseDate?.take(4)?.ifEmpty { null } ?: "N/A",
+        year = releaseYear(releaseDate),
         runtimeMinutes = runtime?.takeIf { it > 0 },
         posterUrl = posterUrl(posterPath),
         backdropUrl = backdropUrl(backdropPath),
@@ -65,31 +57,9 @@ class MovieRepository @Inject constructor(
             .map { it.name }
     )
 
+    private fun releaseYear(date: String?): String? = date?.take(4)?.ifEmpty { null }
     private fun posterUrl(path: String?) = if (path != null) "$IMAGE_BASE_URL/w500$path" else ""
     private fun backdropUrl(path: String?) = if (path != null) "$IMAGE_BASE_URL/w780$path" else ""
-
-    private suspend fun <T> safeApiCall(apiCall: suspend () -> T): T {
-        return try {
-            apiCall()
-        } catch (e: CancellationException) {
-            // No se debe "tragar" la cancelación de la corrutina
-            throw e
-        } catch (e: UnknownHostException) {
-            throw IOException("Sin conexión a internet. Verifica tu red.", e)
-        } catch (e: IOException) {
-            throw IOException("Error de red o conexión interrumpida.", e)
-        } catch (e: HttpException) {
-            val mensaje = when (e.code()) {
-                401, 403 -> "Error de autenticación con el servidor de películas."
-                404 -> "El contenido solicitado no fue encontrado en TMDB."
-                in 500..599 -> "El servidor de TMDB no está respondiendo. Inténtalo más tarde."
-                else -> "Error en el servidor (${e.code()}). Inténtalo de nuevo."
-            }
-            throw Exception(mensaje, e)
-        } catch (e: Exception) {
-            throw Exception("Ocurrió un error inesperado: ${e.localizedMessage ?: "Consulte con soporte."}", e)
-        }
-    }
 
     private companion object {
         const val IMAGE_BASE_URL = "https://image.tmdb.org/t/p"

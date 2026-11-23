@@ -7,15 +7,16 @@ plugins {
     alias(libs.plugins.hilt)
 }
 
-// La API key de TMDB se lee de local.properties (no se sube al repositorio).
-// Si no está definida, se usa una key por defecto para que el proyecto compile al clonarlo.
+// La API key de TMDB se lee de local.properties (archivo ignorado por git, nunca se sube al repo).
+// Agregar en local.properties la línea:  TMDB_API_KEY=tu_api_key
 val localProperties = Properties().apply {
     val file = rootProject.file("local.properties")
     if (file.exists()) file.inputStream().use { load(it) }
 }
-val tmdbApiKey: String = localProperties.getProperty("TMDB_API_KEY")
-    ?.takeIf { it.isNotBlank() }
-    ?: "b03dd5922357d959cbb9c22994c60c2a"
+val tmdbApiKey: String = localProperties.getProperty("TMDB_API_KEY").orEmpty()
+if (tmdbApiKey.isBlank()) {
+    logger.warn("TMDB_API_KEY no está definida en local.properties: la app no podrá consultar la API.")
+}
 
 android {
     namespace = "com.example.seminario"

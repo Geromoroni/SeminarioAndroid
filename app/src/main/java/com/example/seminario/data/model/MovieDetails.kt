@@ -6,7 +6,7 @@ data class MovieDetails(
     val title: String,
     val synopsis: String,
     val rating: Double,
-    val year: String,
+    val year: String?,
     val runtimeMinutes: Int?,
     val posterUrl: String,
     val backdropUrl: String,
@@ -25,19 +25,4 @@ fun MovieDetails.toMovie(): Movie = Movie(
     year = year,
     imageUrl = posterUrl,
     backdropUrl = backdropUrl
-)
-
-val mockMovieDetails = MovieDetails(
-    id = 1,
-    title = "Spider-Man: Brand New Day",
-    synopsis = "A forgotten Peter Parker lives alone as a full-time Spider-Man...",
-    rating = 8.0,
-    year = "2026",
-    runtimeMinutes = 145,
-    posterUrl = "",
-    backdropUrl = "",
-    homepage = null,
-    genres = listOf("Acción", "Aventura"),
-    directors = listOf("Destin Daniel Cretton"),
-    cast = listOf("Tom Holland", "Zendaya")
 )

@@ -9,20 +9,20 @@ interface MovieApiService {
     @GET("movie/popular")
     suspend fun getPopularMovies(
         @Query("api_key") apiKey: String,
-        @Query("language") language: String = "es-AR"
+        @Query("language") language: String
     ): MovieResponse
 
     @GET("trending/movie/week")
     suspend fun getTrendingMovies(
         @Query("api_key") apiKey: String,
-        @Query("language") language: String = "es-AR"
+        @Query("language") language: String
     ): MovieResponse
 
     @GET("search/movie")
     suspend fun searchMovies(
         @Query("api_key") apiKey: String,
         @Query("query") query: String,
-        @Query("language") language: String = "es-AR"
+        @Query("language") language: String
     ): MovieResponse
 
     // movie-details: https://developer.themoviedb.org/reference/movie-details
@@ -31,7 +31,7 @@ interface MovieApiService {
     suspend fun getMovieDetails(
         @Path("movie_id") movieId: Int,
         @Query("api_key") apiKey: String,
-        @Query("language") language: String = "es-AR",
+        @Query("language") language: String,
         @Query("append_to_response") appendToResponse: String = "credits"
     ): MovieDetailsDto
 }

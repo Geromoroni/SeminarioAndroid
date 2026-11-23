@@ -53,7 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.seminario.R
 import com.example.seminario.data.model.Movie
-import com.example.seminario.data.model.mockMovies
+import com.example.seminario.ui.preview.previewMovies
 
 @Composable
 fun MovieContent(
@@ -374,7 +374,7 @@ fun BottomBarItem(
 @Preview(showBackground = true, backgroundColor = 0xFF0F0F13)
 @Composable
 fun PreviewMovieContent() {
-    val listaLarga = listOf(mockMovies[0], mockMovies[1], mockMovies[0], mockMovies[1])
+    val listaLarga = listOf(previewMovies[0], previewMovies[1], previewMovies[0], previewMovies[1])
     MovieContent(
         trending = listaLarga,
         popularMovies = listaLarga,
