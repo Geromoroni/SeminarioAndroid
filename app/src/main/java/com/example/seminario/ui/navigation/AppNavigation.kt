@@ -72,6 +72,9 @@ fun AppNavigation() {
                     MovieContent(
                         trending = state.trending,
                         popularMovies = state.popularMovies,
+                        // Listas de los carruseles nuevos
+                        topRated = state.topRated,
+                        upcoming = state.upcoming,
                         favoriteMovies = favoriteMovies,
                         searchQuery = searchQuery,
                         isSearching = state.isSearching,

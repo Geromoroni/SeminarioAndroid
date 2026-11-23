@@ -37,6 +37,16 @@ class MovieRemoteDataSource @Inject constructor(
         apiService.getTrendingMovies(apiKey, language).results
     }
 
+    // Mejor valoradas: mismos errores tipificados que el resto (vía safeApiCall)
+    suspend fun getTopRatedMovies(): List<MovieDto> = safeApiCall {
+        apiService.getTopRatedMovies(apiKey, language).results
+    }
+
+    // Próximos estrenos
+    suspend fun getUpcomingMovies(): List<MovieDto> = safeApiCall {
+        apiService.getUpcomingMovies(apiKey, language).results
+    }
+
     suspend fun searchMovies(query: String): List<MovieDto> = safeApiCall {
         apiService.searchMovies(apiKey, query, language).results
     }
